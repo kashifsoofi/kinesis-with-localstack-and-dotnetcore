@@ -1,2 +1,2 @@
-# kinesis-with-localstack-and-dotnetcore
-Amazon Kinesis with LocalStack and .NET Core
+# AWS
+Collection of .NET Core samples using AWS
