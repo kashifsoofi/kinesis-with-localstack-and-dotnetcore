@@ -6,3 +6,9 @@ services:
     build:
       context: .
       dockerfile: src/Demo.Producer/Dockerfile
+
+  demo.consumer:
+    image: ${DOCKER_REGISTRY-}demo.consumer
+    build:
+      context: .
+      dockerfile: src/Demo.Consumer/Dockerfile

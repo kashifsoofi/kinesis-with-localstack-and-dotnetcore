@@ -8,6 +8,7 @@ using System.Timers;
 using Amazon;
 using Amazon.Kinesis;
 using Amazon.Kinesis.Model;
+using Amazon.Runtime;
 using Demo.Domain;
 using Microsoft.Extensions.Hosting;
 
@@ -25,7 +26,13 @@ namespace Demo.Producer
 
         public MessageProducerService()
         {
-            _kinesisClient = new AmazonKinesisClient(RegionEndpoint.EUWest1);
+            _kinesisClient = new AmazonKinesisClient(
+                new AnonymousAWSCredentials(),
+                new AmazonKinesisConfig
+                {
+                    ServiceURL = "http://localstack:4568",
+                    RegionEndpoint = RegionEndpoint.EUWest1,
+                });
         }
 
         public Task StartAsync(CancellationToken cancellationToken)
