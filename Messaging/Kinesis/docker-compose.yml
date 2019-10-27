@@ -1,0 +1,8 @@
+version: '3.7'
+
+services:
+  demo.producer:
+    image: ${DOCKER_REGISTRY-}demo.producer
+    build:
+      context: .
+      dockerfile: src/Demo.Producer/Dockerfile
