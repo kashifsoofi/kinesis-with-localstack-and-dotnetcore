@@ -26,44 +26,47 @@ namespace Demo.Producer
 
         public MessageProducerService()
         {
+            var serverName = "localstack";
             _kinesisClient = new AmazonKinesisClient(
-                new AnonymousAWSCredentials(),
+                "DUMMY_KEY",
+                "DUMMY_KEY",
                 new AmazonKinesisConfig
                 {
-                    ServiceURL = "http://localstack:4568",
-                    RegionEndpoint = RegionEndpoint.EUWest1,
+                    ServiceURL = $"http://{serverName}:4568",
                 });
         }
 
         public Task StartAsync(CancellationToken cancellationToken)
         {
-            Console.WriteLine("Timed Message Producer Background Service is starting.");
+            Console.WriteLine("MessageProducer service is starting.");
 
             _timer = new System.Timers.Timer(5000);
             _timer.Elapsed += OnTimedEvent;
             _timer.AutoReset = true;
             _timer.Enabled = true;
 
-            Console.WriteLine("Timed Message Producer Background Service is started.");
+            Console.WriteLine("MessageProducer service is started.");
             return Task.CompletedTask;
         }
 
         public Task StopAsync(CancellationToken cancellationToken)
         {
-            Console.WriteLine("Timed Message Producer Background Service is stopping.");
+            Console.WriteLine("MessageProducer service is stopping.");
 
             _timer?.Stop();
 
-            Console.WriteLine("Timed Message Producer Background Service is stopped.");
+            Console.WriteLine("MessageProducer service is stopped.");
             return Task.CompletedTask;
         }
 
         private void OnTimedEvent(Object source, ElapsedEventArgs e)
         {
+            Console.WriteLine("MessageProducer service on timed event starting.");
+
             var dataMessage = new DataMessage
             {
                 Id = Guid.NewGuid(),
-                CreatedOn = e.SignalTime,
+                CreatedOn = DateTime.UtcNow,
             };
 
             var messageBytes = Encoding.UTF8.GetBytes(JsonSerializer.Serialize<DataMessage>(dataMessage));
@@ -74,14 +77,23 @@ namespace Demo.Producer
                 PartitionKey = "demo-partition",
             };
 
-            var putRecordResponse = _kinesisClient.PutRecordAsync(putRecordRequest).GetAwaiter().GetResult();
-            Console.WriteLine($"Successfully putrecord {_messageCounter}:\n\t partition key = {putRecordRequest.PartitionKey}, shard ID = {putRecordResponse.ShardId}");
-
-            _messageCounter++;
-            if (_messageCounter <= TotalMessagesToCreate)
+            try
             {
-                _timer.Stop();
+                var putRecordResponse = _kinesisClient.PutRecordAsync(putRecordRequest).GetAwaiter().GetResult();
+                Console.WriteLine($"Successfully putrecord number={_messageCounter}{Environment.NewLine}PartitionKey={putRecordRequest.PartitionKey}, ShardId={putRecordResponse.ShardId}{Environment.NewLine}DataMessage Id={dataMessage.Id}, CreatedOn={dataMessage.CreatedOn.ToString("yyyy-MM-dd HH:mm")}");
+
+                _messageCounter++;
+                if (_messageCounter >= TotalMessagesToCreate)
+                {
+                    _timer.Stop();
+                }
             }
+            catch (Exception ex)
+            {
+                Console.Error.WriteLine($"Exception: {ex.Message}");
+            }
+
+            Console.WriteLine("MessageProducer service on timed event finishing.");
         }
 
         public void Dispose()

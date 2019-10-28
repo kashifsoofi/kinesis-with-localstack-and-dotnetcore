@@ -22,12 +22,13 @@ namespace Demo.Consumer
 
         public MessageConsumerService()
         {
+            var serverName = "localstack";
             _kinesisClient = new AmazonKinesisClient(
-                new AnonymousAWSCredentials(),
+                "DUMMY_KEY",
+                "DUMMY_KEY",
                 new AmazonKinesisConfig
                 {
-                    ServiceURL = "http://localstack:4568",
-                    RegionEndpoint = RegionEndpoint.EUWest1,
+                    ServiceURL = $"http://{serverName}:4568",
                 });
         }
 
