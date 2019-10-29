@@ -5,6 +5,10 @@ services:
     depends_on:
       - localstack-setup
 
+  demo.consumer:
+    depends_on:
+      - localstack-setup
+
   localstack:
     image: localstack/localstack
     ports:

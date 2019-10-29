@@ -17,10 +17,10 @@ COPY ./src ./src
 RUN dotnet build -c Release --no-restore
 
 FROM build AS publish
-RUN dotnet publish "./src/Demo.Producer/Demo.Producer.csproj" -c Release -o /app --no-restore
+RUN dotnet publish "./src/Demo.Consumer/Demo.Consumer.csproj" -c Release -o /app --no-restore
 
 # application image
 FROM mcr.microsoft.com/dotnet/core/aspnet:3.0-alpine
 WORKDIR /app
 COPY --from=publish /app ./
-ENTRYPOINT ["dotnet", "Demo.Producer.dll"]
+ENTRYPOINT ["dotnet", "Demo.Consumer.dll"]
