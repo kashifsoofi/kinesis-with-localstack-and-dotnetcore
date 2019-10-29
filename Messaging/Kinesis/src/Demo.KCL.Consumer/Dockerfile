@@ -17,10 +17,12 @@ COPY ./src ./src
 RUN dotnet build -c Release --no-restore
 
 FROM build AS publish
-RUN dotnet publish "./src/Demo.Consumer/Demo.Consumer.csproj" -c Release -o /app --no-restore --no-build
+RUN dotnet publish ./src/Demo.Kcl.Consumer/Demo.Kcl.Consumer.csproj -c Release -o /app/consumer --no-restore --no-build
+RUN dotnet publish ./src/Bootstrap/Bootstrap.csproj -c Release -o /app/bootstrap --no-restore --no-build
 
 # application image
 FROM mcr.microsoft.com/dotnet/core/aspnet:3.0-alpine
+RUN apk --no-cache add openjdk11 --repository=http://dl-cdn.alpinelinux.org/alpine/edge/community
 WORKDIR /app
 COPY --from=publish /app ./
-ENTRYPOINT ["dotnet", "Demo.Consumer.dll"]
+ENTRYPOINT ["dotnet", "./bootstrap/Bootstrap.dll", "--properties", "kcl.properties", "--execute"]
