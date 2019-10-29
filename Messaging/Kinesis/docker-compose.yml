@@ -12,3 +12,9 @@ services:
     build:
       context: .
       dockerfile: src/Demo.Consumer/Dockerfile
+
+  demo.kcl.consumer:
+    image: ${DOCKER_REGISTRY-}demo.kcl.consumer
+    build:
+      context: .
+      dockerfile: src/Demo.Kcl.Consumer/Dockerfile

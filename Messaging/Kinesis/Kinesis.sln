@@ -20,7 +20,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Demo.Domain", "src\Demo.Dom
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Demo.Producer", "src\Demo.Producer\Demo.Producer.csproj", "{B7F43B1A-089F-48F2-B3B1-5090D9908988}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Demo.Kcl.Consumer", "src\Demo.KCL.Consumer\Demo.KCL.Consumer.csproj", "{8D7F51B2-E5D4-4FDE-B9F5-D3CEA31472B3}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Demo.Kcl.Consumer", "src\Demo.Kcl.Consumer\Demo.Kcl.Consumer.csproj", "{8D7F51B2-E5D4-4FDE-B9F5-D3CEA31472B3}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Bootstrap", "src\Bootstrap\Bootstrap.csproj", "{1B48F1FA-891B-4479-B026-AC02A0878C7A}"
 EndProject

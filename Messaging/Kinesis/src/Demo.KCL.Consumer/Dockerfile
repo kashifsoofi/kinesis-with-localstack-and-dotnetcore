@@ -25,4 +25,7 @@ FROM mcr.microsoft.com/dotnet/core/aspnet:3.0-alpine
 RUN apk --no-cache add openjdk11 --repository=http://dl-cdn.alpinelinux.org/alpine/edge/community
 WORKDIR /app
 COPY --from=publish /app ./
-ENTRYPOINT ["dotnet", "./bootstrap/Bootstrap.dll", "--properties", "kcl.properties", "--execute"]
+WORKDIR /app/bootstrap
+RUN dotnet Bootstrap.dll --properties /app/consumer/kcl.properties
+
+ENTRYPOINT ["dotnet", "Bootstrap.dll", "--properties", "/app/consumer/kcl.properties", "--execute"]
