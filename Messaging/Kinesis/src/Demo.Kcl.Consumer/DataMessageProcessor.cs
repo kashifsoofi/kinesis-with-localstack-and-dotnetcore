@@ -7,7 +7,7 @@ using Demo.Domain;
 
 namespace Demo.Kcl.Consumer
 {
-    public class DataMessageProcessor : IRecordProcessor
+    public class DataMessageProcessor : IShardRecordProcessor
     {
         /// <value>The time to wait before this record processor
         /// reattempts either a checkpoint, or the processing of a record.</value>
@@ -49,8 +49,6 @@ namespace Demo.Kcl.Consumer
         /// </param>
         public void ProcessRecords(ProcessRecordsInput input)
         {
-            Console.Error.WriteLine("Processing " + input.Records.Count + " records from " + _kinesisShardId);
-
             // Process records and perform all exception handling.
             ProcessRecordsWithRetries(input.Records);
 
@@ -62,21 +60,29 @@ namespace Demo.Kcl.Consumer
             }
         }
 
-        /// <summary>
-        /// This shuts down the record processor and checkpoints the specified checkpointer.
-        /// </summary>
-        /// <param name="input">
-        /// ShutdownContext containing information such as the reason for shutting down the record processor,
-        /// as well as a Checkpointer.
-        /// </param>
-        public void Shutdown(ShutdownInput input)
+        public void LeaseLost(LeaseLossInput leaseLossInput)
         {
-            Console.Error.WriteLine("Shutting down record processor for shard: " + _kinesisShardId);
-            // Checkpoint after reaching end of shard, so we can start processing data from child shards.
-            if (input.Reason == ShutdownReason.TERMINATE)
-            {
-                Checkpoint(input.Checkpointer);
-            }
+            //
+            // Perform any necessary cleanup after losing your lease.  Checkpointing is not possible at this point.
+            //
+            Console.Error.WriteLine($"Lost lease on {_kinesisShardId}");
+        }
+
+        public void ShardEnded(ShardEndedInput shardEndedInput)
+        {
+            //
+            // Once the shard has ended it means you have processed all records on the shard. To confirm completion the
+            // KCL requires that you checkpoint one final time using the default checkpoint value.
+            //
+            Console.Error.WriteLine(
+                $"All records for {_kinesisShardId} have been processed, starting final checkpoint");
+            shardEndedInput.Checkpointer.Checkpoint();
+        }
+
+        public void ShutdownRequested(ShutdownRequestedInput shutdownRequestedInput)
+        {
+            Console.Error.WriteLine($"Shutdown has been requested for {_kinesisShardId}. Checkpointing");
+            shutdownRequestedInput.Checkpointer.Checkpoint();
         }
 
         /// <summary>
