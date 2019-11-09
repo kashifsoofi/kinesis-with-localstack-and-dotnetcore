@@ -1,30 +1,13 @@
 version: '3.7'
 
-networks:
-  demo_network:
-    driver: bridge
-    ipam:
-      config:
-        - subnet: 169.254.170.0/24
-
 services:
   demo.producer:
     depends_on:
       - localstack-setup
-    dns:
-      - 169.254.170.3
-    networks:
-      demo_network:
-        ipv4_address: 169.254.170.7
 
   demo.consumer:
     depends_on:
       - localstack-setup
-    dns:
-      - 169.254.170.3
-    networks:
-      demo_network:
-        ipv4_address: 169.254.170.8
 
   demo.kcl.consumer:
     depends_on:
@@ -33,18 +16,6 @@ services:
       - AWS_REGION=eu-west-1
       - AWS_SECRET_ACCESS_KEY=DUMMY_KEY
       - AWS_ACCESS_KEY_ID=DUMMY_KEY
-    dns:
-      - 169.254.170.3
-    networks:
-      demo_network:
-        ipv4_address: 169.254.170.9
-
-  coredns:
-    build:
-      context: ./coredns
-    networks:
-      demo_network:
-        ipv4_address: 169.254.170.3
 
   localstack:
     image: localstack/localstack
@@ -64,11 +35,6 @@ services:
     volumes:
       - localstackdata:/tmp/localstack
       - /var/run/docker.sock:/var/run/docker.sock
-    dns:
-      - 169.254.170.3
-    networks:
-      demo_network:
-        ipv4_address: 169.254.170.5
 
   localstack-setup:
     build:
@@ -78,11 +44,6 @@ services:
     environment:
       - "AWS_SECRET_ACCESS_KEY=DUMMY_KEY"
       - "AWS_ACCESS_KEY_ID=DUMMY_KEY"
-    dns:
-      - 169.254.170.3
-    networks:
-      demo_network:
-        ipv4_address: 169.254.170.6
 
 volumes:
   localstackdata:
