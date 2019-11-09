@@ -9,6 +9,14 @@ services:
     depends_on:
       - localstack-setup
 
+  demo.kcl.consumer:
+    depends_on:
+      - localstack-setup
+    environment:
+      - AWS_REGION=eu-west-1
+      - AWS_SECRET_ACCESS_KEY=DUMMY_KEY
+      - AWS_ACCESS_KEY_ID=DUMMY_KEY
+
   localstack:
     image: localstack/localstack
     ports:
