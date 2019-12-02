@@ -1,0 +1,10 @@
+﻿{
+  "profile": "default",
+  "region": "eu-west-1",
+  "configuration": "Release",
+  "framework": "netcoreapp3.0",
+  "function-runtime": "dotnetcore3.0",
+  "function-memory-size": 256,
+  "function-timeout": 30,
+  "function-handler": "Demo.Consumer.Lambda::Demo.Consumer.Lambda::Handler"
+}

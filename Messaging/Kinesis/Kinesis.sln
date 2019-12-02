@@ -26,6 +26,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Bootstrap", "src\Bootstrap\
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ClientLibrary", "src\ClientLibrary\ClientLibrary.csproj", "{B679EBF2-5456-4813-8BB0-3574236AC12E}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Demo.Consumer.Lambda", "src\Demo.Consumer.Lambda\Demo.Consumer.Lambda.csproj", "{8F099E3B-5C12-4495-9AAB-00C4DD4B4379}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -56,6 +58,10 @@ Global
 		{B679EBF2-5456-4813-8BB0-3574236AC12E}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{B679EBF2-5456-4813-8BB0-3574236AC12E}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{B679EBF2-5456-4813-8BB0-3574236AC12E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8F099E3B-5C12-4495-9AAB-00C4DD4B4379}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8F099E3B-5C12-4495-9AAB-00C4DD4B4379}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8F099E3B-5C12-4495-9AAB-00C4DD4B4379}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8F099E3B-5C12-4495-9AAB-00C4DD4B4379}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
