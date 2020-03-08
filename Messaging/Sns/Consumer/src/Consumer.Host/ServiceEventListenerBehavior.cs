@@ -13,10 +13,9 @@
 
         public override async Task Invoke(IIncomingLogicalMessageContext context, Func<Task> next)
         {
-            if (context.Message.MessageType == typeof(ServiceEvent))
+            if (context.Message.Instance is ServiceEvent serviceEvent)
             {
-                var serviceEvent = context.Message.Instance as ServiceEvent;
-
+                context.UpdateMessageInstance(serviceEvent.Event);
             }
 
             await next().ConfigureAwait(false);
