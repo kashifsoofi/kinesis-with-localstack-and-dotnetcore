@@ -13,6 +13,7 @@
     <PackageReference Include="AWSSDK.S3" Version="3.3.104.28" />
     <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="3.1.2" />
     <PackageReference Include="AWSSDK.SimpleNotificationService" Version="3.3.101.130" />
+    <PackageReference Include="NServiceBus.Newtonsoft.Json" Version="2.2.0" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Producer.Contracts\Producer.Contracts.csproj" />

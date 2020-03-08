@@ -58,6 +58,7 @@
             endpointConfiguration.SendFailedMessagesTo("error");
             endpointConfiguration.EnableInstallers();
             endpointConfiguration.UsePersistence<InMemoryPersistence>();
+            endpointConfiguration.UseSerialization<NewtonsoftSerializer>();
 
             var routing = transport.Routing();
             routing.RegisterPublisher(typeof(ProducerEvent), "producer-host");

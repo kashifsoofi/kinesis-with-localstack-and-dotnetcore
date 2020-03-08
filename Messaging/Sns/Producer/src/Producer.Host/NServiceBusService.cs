@@ -79,6 +79,7 @@
             endpointConfiguration.SendFailedMessagesTo("error");
             endpointConfiguration.EnableInstallers();
             endpointConfiguration.UsePersistence<InMemoryPersistence>();
+            endpointConfiguration.UseSerialization<NewtonsoftSerializer>();
 
             var pipeline = endpointConfiguration.Pipeline;
             pipeline.Register(
