@@ -1,7 +1,9 @@
-﻿namespace Producer.Host
+﻿namespace Consumer.Host
 {
+    using System.Linq;
     using System.Threading.Tasks;
     using Amazon;
+    using Amazon.Runtime.SharedInterfaces;
     using Amazon.SimpleNotificationService;
     using Amazon.SimpleNotificationService.Model;
 
@@ -46,6 +48,19 @@
             };
             var response = await client.PublishAsync(request);
             return response.MessageId;
+        }
+
+        public async Task<string> SubscribeAsync(string topicArn, ICoreAmazonSQS sqsClient, string sqsQueueUrl)
+        {
+            var listSubscriptionsByTopicResponse = await client.ListSubscriptionsByTopicAsync(topicArn);
+            var sqsQueueSubscription = listSubscriptionsByTopicResponse.Subscriptions.FirstOrDefault(x => x.Endpoint == sqsQueueUrl);
+            if (sqsQueueSubscription != null)
+            {
+                return sqsQueueSubscription.SubscriptionArn;
+            }
+
+            var result = await client.SubscribeQueueAsync(topicArn, sqsClient, sqsQueueUrl);
+            return result;
         }
     }
 }

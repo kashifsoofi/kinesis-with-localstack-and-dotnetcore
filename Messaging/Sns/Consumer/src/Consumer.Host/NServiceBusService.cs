@@ -1,6 +1,7 @@
-﻿namespace Producer.Host
+﻿namespace Consumer.Host
 {
     using System;
+    using System.Collections.Generic;
     using System.Threading;
     using System.Threading.Tasks;
     using Amazon.Runtime;
@@ -8,11 +9,11 @@
     using Amazon.SQS;
     using Microsoft.Extensions.Hosting;
     using NServiceBus;
+    using NServiceBus.Logging;
     using Producer.Contracts;
 
     public class NServiceBusService : IHostedService
     {
-        private Timer timer;
         private IEndpointInstance endpointInstance;
 
         public IMessageSession MessageSession { get; internal set; }
@@ -24,25 +25,7 @@
             endpointInstance = await Endpoint.Start(endpointConfiguration).ConfigureAwait(false);
             MessageSession = endpointInstance;
 
-            timer = new Timer(DoWork, null, 10 * 1000, 10 * 1000);
-        }
-
-        private async void DoWork(object state)
-        {
-            var id = Guid.NewGuid();
-            var producerEvent = new ProducerEvent
-            {
-                Id = id,
-                Message = id.ToString("N"),
-            };
-            await endpointInstance.Publish(producerEvent).ConfigureAwait(false);
-
-            //Console.WriteLine("Do you want to continue timer? (Y/N)");
-            //var consoleKeyInfo = Console.ReadKey();
-            //if (consoleKeyInfo.Key == ConsoleKey.Y)
-            //{
-            //    timer?.Change(10 * 1000, Timeout.Infinite);
-            //}
+            await RegisterServiceEventListener();
         }
 
         public async Task StopAsync(CancellationToken cancellationToken)
@@ -55,25 +38,26 @@
 
         private EndpointConfiguration ConfigureEndpoint()
         {
-            var endpointConfiguration = new EndpointConfiguration("producer-host");
+            LogManager.Use<DefaultFactory>()
+                .Level(LogLevel.Info);
+
+            var endpointConfiguration = new EndpointConfiguration("consumer-host");
             endpointConfiguration.DoNotCreateQueues();
 
-            var serverName = "localhost";
             var transport = endpointConfiguration.UseTransport<SqsTransport>();
             transport.ClientFactory(() => new AmazonSQSClient(
                 new AnonymousAWSCredentials(),
                 new AmazonSQSConfig
                 {
-                    ServiceURL = $"http://{serverName}:4576"
+                    ServiceURL = "http://localhost:4576"
                 }));
 
-            var s3Configuration = transport.S3("bucketname", "producer-host");
+            var s3Configuration = transport.S3("bucketname", "consumer-host");
             s3Configuration.ClientFactory(() => new AmazonS3Client(
                 new AnonymousAWSCredentials(),
                 new AmazonS3Config
                 {
-                    ServiceURL = $"http://{serverName}:4572",
-                    ForcePathStyle = true,
+                    ServiceURL = "http://localhost:4572"
                 }));
 
             endpointConfiguration.SendFailedMessagesTo("error");
@@ -82,10 +66,38 @@
 
             var pipeline = endpointConfiguration.Pipeline;
             pipeline.Register(
-                behavior: new SnsPublisherBehavior(),
+                behavior: new ServiceEventListenerBehavior(),
                 description: "Publish message to sns");
 
             return endpointConfiguration;
+        }
+
+        private async Task RegisterServiceEventListener()
+        {
+            var serviceEventTypes = new List<Type>
+            {
+                typeof(ProducerEvent),
+            };
+
+            var sqsClient = new AmazonSQSClient(
+                new AnonymousAWSCredentials(),
+                new AmazonSQSConfig
+                {
+                    ServiceURL = "http://localhost:4576"
+                });
+
+            var sqsQueueName = "consumer-host";
+            var getQueueUrlResponse = await sqsClient.GetQueueUrlAsync(sqsQueueName);
+
+
+            var snsService = new SnsService();
+            foreach (var serviceEventType in serviceEventTypes)
+            {
+                var topicName = serviceEventType.FullName.Replace(".", "-").ToLower();
+                var topicArn = await snsService.GetOrCreateTopicArn(topicName);
+
+                await snsService.SubscribeAsync(topicArn, sqsClient, getQueueUrlResponse.QueueUrl);
+            }
         }
     }
 }
